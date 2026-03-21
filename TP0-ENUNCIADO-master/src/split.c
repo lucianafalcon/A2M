@@ -6,8 +6,12 @@ struct vector *split(char *texto, char separador) {
   int i = 0, j = 0;
   char vector_auxiliar[100];
 
+  if (texto == NULL) {
+    return NULL;
+  }
+
   struct vector *v = malloc(sizeof(struct vector));
-  v->palabras = malloc(10 * sizeof(char *));
+  v->palabras = calloc(10 * sizeof(char *));
   v->cantidad = 0;
 
   while (texto[i] != '\0') {
@@ -25,6 +29,12 @@ struct vector *split(char *texto, char separador) {
     }
     i++;
   }
+
+  vector_auxiliar[j] = '\0';
+  v->palabras[v->cantidad] = malloc((size_t)(j + 1));
+  strcpy(v->palabras[v->cantidad], vector_auxiliar);
+  v->cantidad++;
+
   return v;
 }
 
@@ -35,4 +45,5 @@ void vector_destruir(struct vector *v) {
   free(v->palabras);
 
   free(v);
+}
 }
