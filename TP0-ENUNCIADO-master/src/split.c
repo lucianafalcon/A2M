@@ -4,7 +4,7 @@
 
 struct vector *split(char *texto, char separador)
 {
-    int i,j=0;
+    int i=0,j=0;
     char vector_auxiliar[100];
 
     struct vector *v = malloc(sizeof(struct vector));
