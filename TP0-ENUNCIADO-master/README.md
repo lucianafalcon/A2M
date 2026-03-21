@@ -102,9 +102,10 @@ Esta implementación permite:
 Para implementar la estructura decidí hacerlo con un campo..., además tiene un puntero que... y eso permite que....
 
 ### 3.1. Diagrama de memoria
-
-![Untitled Diagram](https://github.com/user-attachments/assets/eac8cb3e-b049-4e67-85b4-489fa7410fae)
-
+<div align="center">
+<img src="https://github.com/user-attachments/assets/eac8cb3e-b049-4e67-85b4-489fa7410fae" width="40%">
+<p>Figura 3.1 - Diagrama de memoria del programa.</p>
+</div>
 
 
 ### 3.2. Análisis de complejidades 
