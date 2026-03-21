@@ -4,19 +4,13 @@
 
 # TP
 
-> [!IMPORTANT]
-> Esto es una plantilla del informe donde cada sección está delimitada por su título. Se recomienda mantener las secciones y tomar los ejemplos de las mismas para hacer el informe. El contenido de las secciones y comentarios como este deben ser eliminados del informe presentado.
-
 ## Información del estudiante
 
-* (Nombre y Apellido)
-* (Padrón)
-* (Mail)
+* Luciana Falcon
+* 107316
+* lfalcon@fi.uba.ar
 
 ---
-
-> [!WARNING]
-> Tener en cuenta que el informe se solicita en el ámbito universitario; el texto debe ser coherente, gramatical y ortográficamente correcto y con vocabulario adecuado para dicho contexto.
 
 ## Índice
 * [1. Instrucciones](#1-Instrucciones)
@@ -32,92 +26,109 @@
 
 ## 1. Instrucciones
 
-> [!TIP]
-> Se recomienda usar un Makefile y colocar en esta sección los comandos Make.
-
 ### 1.1. Compilar el proyecto
 ```bash
-comando
+gcc split.c main.c -g -o split.out
 ```
 
 ### 1.2. Ejecutar las pruebas
 ```bash
-comando
+./split.out
 ```
 
 ### 1.3. Ejecutar el programa con Valgrind
 ```bash
-comando
+valgrind --leak-check=full ./split.out
 ```
 
 ## 2. Funcionamiento
-Explicar **qué** hace el TP implementado, aclarando todas las decisiones de funcionamiento que no estaban definidas por el enunciado.
+El programa implementa la función plit.c que divide un texto en múltiples palabras utilizando un carácter separador.   
+Adicionalemente el programa incluye una función encargada de liberar correctamente toda la memoria utilizada.
 
-> [!IMPORTANT]
-> Es muy importante entender la *diferencia entre qué y cómo*. En esta sección **NO** se busca una explicación de cómo implementaste el programa, qué funciones usaste, en qué línea, etc.; se busca una explicación de **qué** es lo que hace el programa en líneas generales.
+Dado un string de entrada, el programa recorre el texto carácter por carácter y separa las subcadenas cada vez que encuentra el separador. Cada palabra obtenida se almacena en memoria de forma dinámica.
 
-Se debe incluir todos los diagramas que sean necesarios para explicar el funcionamiento del programa. Las estructuras deberán ser explicadas con diagramas de memoria. Los diagramas pedidos en el enunciado pueden ser colocados en esta sección, pero recordá indicarlo en la sección de respuestas.
+El resultado final es una estructura que contiene:
+- Un arreglo dinámico de strings, palabras.
+- La cantidad total de palabras encontradas.
 
-> [!WARNING]
-> Es importante usar diagramas para explicar los conceptos de forma clara, pero el exceso será negativo. Los diagramas deben tener un fin explicativo y, por lo general, sirven para reemplazar uno o múltiples párrafos de explicación.
+```mermaid
+flowchart TD
 
-## 2. Funcionamiento (EJEMPLO)
-El programa recibe 7 números del usuario y una vez obtenidos todos los muestra en pantalla. Para esto define un vector estático de 7 elementos y llena el mismo con los datos que inserta el usuario; cuando termina de insertar todos los números procede a imprimirlos en pantalla.
-<div align="center">
-  <img src="img/diagrama_flujo_programa.svg" width="70%">
-  <p>Diagrama de flujo del programa explicado con más detalle.</p>
-</div>
+A[Inicio] --> B[Inicializar i = 0, j = 0]
 
-Cuando el vector llega a su máximo el programa procede a escalarlo con un factor de crecimiento..., es decir, si el vector tenía....
+B --> C{Fin del texto?}
 
+C -- Si --> Z[Fin]
+
+C -- No --> D{Caracter distinto del separador?}
+
+D -- Si --> E[Agregar caracter al buffer]
+E --> H[Incrementar i]
+
+D -- No --> F{Hay palabra acumulada?}
+
+F -- Si --> G[Guardar palabra en vector y resetear buffer]
+G --> H
+
+F -- No --> H
+
+H --> C
+```
+
+Por ejemplo, si el texto es:
+
+"Hola;1;2;3;mundo"
+
+y el separador es ';', el resultado será:
+
+["Hola", "1", "2", "3", "mundo"]
+
+ 
 ## 3. Estructura
-Explicar cómo se implementó la/s estructura/s pedida/s en el [enunciado](./ENUNCIADO.md). En esta sección el objetivo es explicar en líneas generales, no técnicas, qué contiene la estructura, para qué y por qué.
+
+La estructura principal utilizada en el programa es un vector dinámico de strings.
+
+Esta estructura contiene:
+- Un campo `cantidad` que indica cuántas palabras fueron almacenadas.
+- Un doble puntero `palabras`, que apunta a un arreglo dinámico de strings.
+
+Cada palabra se almacena en memoria dinámica de forma independiente, lo que permite manejar textos de tamaño variable.
+
+Esta implementación permite:
+- Acceso directo a cada palabra mediante índices.
+- Manejo dinámico de memoria.
 
 ## 3. Estructura (EJEMPLO)
 Para implementar la estructura decidí hacerlo con un campo..., además tiene un puntero que... y eso permite que....
 
 ### 3.1. Diagrama de memoria
-Realizar un diagrama de memoria de la estructura de memoria durante la ejecución del programa, esto debe incluir el stack y el heap con las estructuras contenidas en ellos.
 
-### 3.1 Diagrama de memoria (EJEMPLO)
-<div align="center">
-  <img src="img/diagrama_memoria__1.svg" width="70%">
-  <p>Diagrama de memoria de la estructura.</p>
-</div>
+![Untitled Diagram](https://github.com/user-attachments/assets/eac8cb3e-b049-4e67-85b4-489fa7410fae)
 
 
-### 3.2. Análisis de complejidades
-Explicar las complejidades de las diversas funciones que se implementaron en el programa. Esto debe incluir al menos a las funciones de la interfaz (el .h) del programa. Además, se debe ofrecer una justificación de la complejidad, es decir, por qué es esa la complejidad Big-O y no otra.
 
-### 3.2. Análisis de complejidades (EJEMPLO 1)
-En el programa tenemos funciones auxiliares y funciones principales (las que van en el .h). Respecto a estas funciones podemos analizar que:
-* `fun1` tiene una complejidad de $O(1)$ ya que tiene como parámetro... y, al leer una línea....
-* `fun2` tiene una complejidad de $O(n)$ ya que tiene como parámetro..., la cual....
-* `fun3` tiene una complejidad de $O(n^2)$ ya que tiene como parámetro... y se encarga de....
-
-### 3.2. Análisis de complejidades (EJEMPLO 2)
-|      Función      |Complejidad|                 Justificación                  |
-|:-----------------:|:---------:|:----------------------------------------------:|
-|      `fun1`       |  $O(1)$   |Tiene como parámetro... y, al leer una línea....|
-|      `fun2`       |  $O(n)$   |Tiene como parámetro..., la cual....            |
-|      `fun3`       |  $O(n^2)$ |Tiene como parámetro... y se encarga de....     |
+### 3.2. Análisis de complejidades 
+| Función              | Complejidad | Justificación |
+|---------------------|------------|--------------|
+| `split`             | O(n)       | Recorre el string una sola vez, donde n es la longitud del texto. |
+| `vector_destruir`   | O(n)       | Libera cada palabra del vector, recorriendo todas las palabras. |
 
 ## 4. Decisiones de diseño y/o complejidades de implementación
-Explicar las decisiones de diseño y/o las complejidades de implementación que hubo durante la resolución del TP.
 
-## 4. Decisiones de diseño y/o complejidades de implementación (EJEMPLO)
-La mayor complejidad en el TP se encuentra en la función `foo` que requiere hacer...; es por esto que decidí.... Además, decidí que el programa haga... para mejorar la implementación.
+Una de las decisiones principales fue utilizar memoria dinámica para almacenar tanto el vector de palabras como cada palabra individual. Esto permite manejar textos de tamaño variable sin restricciones estrictas.
+
+Se utilizó un buffer auxiliar para construir cada palabra antes de almacenarla, lo que simplifica la lógica de separación.
+
+Una limitación de la implementación es que el tamaño del arreglo de palabras es fijo (10 elementos), lo cual podría mejorarse implementando redimensionamiento dinámico.
+
 
 ## 5. Respuestas a las preguntas teóricas
-Deberás incluir en esta sección las respuestas a las preguntas teóricas indicadas en el [enunciado](./ENUNCIADO.md) del TP.
 
-## 5. Respuestas a las preguntas teóricas (EJEMPLO)
+### 5.1. Explique cómo funcionan los strings en C.
+En C, los strings son arreglos de caracteres (`char`). Un string es una secuencia de caracteres almacenados en memoria secuencialmente y finaliza con un carácter nulo (`'\0'`), que sirve para determinar la longitud del string usando librerias.
 
-### 5.1. ¿Porqué...?
-Respondido en su respectiva sección.
+### 5.2 Explique el funcionamiento de las primitivas malloc y free.
 
-### 5.2 ¿Cómo...?
-Para implementar el....
+La función `malloc` se utiliza para reservar memoria dinámica en el heap durante la ejecución del programa. Recibe como parámetro la cantidad de bytes a reservar y devuelve un puntero al bloque de memoria asignado. En caso de no poder reservar memoria, devuelve `NULL`.
 
-### 5.3 ¿Cuál fue el...?
-El motivo fue....
+La función `free` se utiliza para liberar la memoria reservada con `malloc` para evitar pérdidas de memoria (memory leaks).
