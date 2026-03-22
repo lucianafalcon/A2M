@@ -66,23 +66,3 @@ void vector_destruir(struct vector *v) {
     free(v->palabras);
     free(v);
 }
-
-/*int main() {
-  char texto[] = "hola;1;2;3";
-  char separador = ';';
-  int i=0;
-
-  struct vector *v = split(texto, separador);
-
-  if (v == NULL) {
-    printf("error split\n");
-  }
-
-  for (i = 0; i < v->cantidad; i++) {
-    printf("Palabra %d: %s\n", i, v->palabras[i]);
-  }
-
-  vector_destruir(v);
-
-  return 0;
-}*/
