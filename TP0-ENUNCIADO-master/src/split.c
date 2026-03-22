@@ -4,48 +4,67 @@
 #include <string.h>
 
 struct vector *split(char *texto, char separador) {
-  int i = 0, j = 0;
-  char vector_auxiliar[100];
+    int i = 0, j = 0;
+    char vector_auxiliar[100];
 
-  if (texto == NULL)
-    return NULL;
+    if (texto == NULL)
+      return NULL;
 
-  struct vector *v = malloc(sizeof(struct vector));
-  v->palabras = calloc(10, sizeof(char *));
-  v->cantidad = 0;
+    struct vector *v = malloc(sizeof(struct vector));
+    if (!v)
+      return NULL;
 
-  while (texto[i] != '\0') {
-    if (texto[i] != separador) {
-      vector_auxiliar[j] = texto[i];
-      j++;
-    } else {
-      if (j > 0) {
-        vector_auxiliar[j] = '\0';
-        v->palabras[v->cantidad] = malloc((size_t)(j + 1) * sizeof(char));
+    v->palabras = malloc(capacidad, sizeof(char *));
+    v->cantidad = 0;
+
+    while (texto[i] != '\0') {
+      if (texto[i] != separador) {
+        vector_auxiliar[j] = texto[i];
+        j++;
+      } else {
+        buffer[j] = '\0';
+
+        if (v->cantidad >= capacidad) {
+          capacidad *= 2;
+          char **temp = realloc(v->palabras, capacidad * sizeof(char *));
+          if (!temp)
+            return v;
+          v->palabras = tmp;
+        }
+
+        v->palabras[v->cantidad] = malloc((j + 1) * sizeof(char));
         strcpy(v->palabras[v->cantidad], vector_auxiliar);
         v->cantidad++;
         j = 0;
       }
+      i++;
     }
-    i++;
-  }
 
-  if (j > 0) {
-    vector_auxiliar[j] = '\0';
-    v->palabras[v->cantidad] = malloc((size_t)(j + 1) * sizeof(char));
+    if (v->cantidad >= capacidad) {
+      capacidad *= 2;
+      char **temp = realloc(v->palabras, capacidad * sizeof(char *));
+      if (!temp)
+        return v;
+      v->palabras = tmp;
+    }
+
+    v->palabras[v->cantidad] = malloc((j + 1) * sizeof(char));
     strcpy(v->palabras[v->cantidad], vector_auxiliar);
     v->cantidad++;
-  }
 
-  return v;
+    return v;
 }
 
 void vector_destruir(struct vector *v) {
-  for (int i = 0; i < v->cantidad; i++) {
-    free(v->palabras[i]);
-  }
-  free(v->palabras);
-  free(v);
+    if (!v)
+      return;
+
+    for (int i = 0; i < v->cantidad; i++) {
+      free(v->palabras[i]);
+    }
+
+    free(v->palabras);
+    free(v);
 }
 
 /*int main() {
