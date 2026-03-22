@@ -1,15 +1,18 @@
 #include "split.h"
-
 #include <stdlib.h>
 #include <string.h>
 
 #define CAPACIDAD_INICIAL 10
 
 struct vector *split(char *texto, char separador) {
-    if (texto == NULL) return NULL;
+    if (texto == NULL) {
+        return NULL;
+    }
 
     struct vector *v = malloc(sizeof(struct vector));
-    if (!v) return NULL;
+    if (!v) {
+        return NULL;
+    }
 
     size_t capacidad = CAPACIDAD_INICIAL;
     v->palabras = malloc(capacidad * sizeof(char *));
@@ -29,7 +32,9 @@ struct vector *split(char *texto, char separador) {
             if (v->cantidad >= capacidad) {
                 capacidad *= 2;
                 char **temp = realloc(v->palabras, capacidad * sizeof(char *));
-                if (!temp) return v;
+                if (!temp) {
+                    return v;
+                }
                 v->palabras = temp;
             }
 
@@ -40,7 +45,9 @@ struct vector *split(char *texto, char separador) {
                 v->cantidad++;
             }
 
-            if (texto[i] == '\0') break;
+            if (texto[i] == '\0') {
+                break;
+            }
             inicio = i + 1;
         }
         i++;
@@ -50,7 +57,9 @@ struct vector *split(char *texto, char separador) {
 }
 
 void vector_destruir(struct vector *v) {
-    if (!v) return;
+    if (!v) {
+        return;
+    }
     for (size_t i = 0; i < v->cantidad; i++) {
         free(v->palabras[i]);
     }
