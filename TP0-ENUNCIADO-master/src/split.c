@@ -1,7 +1,7 @@
 #include "split.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 struct vector *split(char *texto, char separador) {
   int i = 0, j = 0;
@@ -48,7 +48,7 @@ void vector_destruir(struct vector *v) {
   free(v);
 }
 
-int main() {
+/*int main() {
   char texto[] = "hola;1;2;3";
   char separador = ';';
   int i=0;
@@ -66,4 +66,4 @@ int main() {
   vector_destruir(v);
 
   return 0;
-}
+}*/
