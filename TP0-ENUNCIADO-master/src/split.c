@@ -1,4 +1,5 @@
 #include "split.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -12,11 +13,11 @@ struct vector *split(char *texto, char separador) {
     if (!v)
         return NULL;
 
-    int capacidad = CAPACIDAD_INICIAL;
+    size_t capacidad = CAPACIDAD_INICIAL;
     v->palabras = malloc(capacidad * sizeof(char *));
     v->cantidad = 0;
 
-    int i = 0, j = 0;
+    size_t i = 0, j = 0;
     char buffer[100];
 
     while (texto[i] != '\0') {
@@ -25,17 +26,19 @@ struct vector *split(char *texto, char separador) {
         } else {
             buffer[j] = '\0';
 
-            if (v->cantidad >= capacidad) {
-                capacidad *= 2;
-                char **temp = realloc(v->palabras, capacidad * sizeof(char *));
-                if (!temp)
-                    return v;
-                v->palabras = temp;
-            }
+            if (j > 0) {  // evita strings vacíos
+                if (v->cantidad >= capacidad) {
+                    capacidad *= 2;
+                    char **temp = realloc(v->palabras, capacidad * sizeof(char *));
+                    if (!temp)
+                        return v;
+                    v->palabras = temp;
+                }
 
-            v->palabras[v->cantidad] = malloc((j + 1) * sizeof(char));
-            strcpy(v->palabras[v->cantidad], buffer);
-            v->cantidad++;
+                v->palabras[v->cantidad] = malloc((j + 1) * sizeof(char));
+                strcpy(v->palabras[v->cantidad], buffer);
+                v->cantidad++;
+            }
             j = 0;
         }
         i++;
@@ -43,17 +46,19 @@ struct vector *split(char *texto, char separador) {
 
     buffer[j] = '\0';
 
-    if (v->cantidad >= capacidad) {
-        capacidad *= 2;
-        char **temp = realloc(v->palabras, capacidad * sizeof(char *));
-        if (!temp)
-            return v;
-        v->palabras = temp;
-    }
+    if (j > 0) {
+        if (v->cantidad >= capacidad) {
+            capacidad *= 2;
+            char **temp = realloc(v->palabras, capacidad * sizeof(char *));
+            if (!temp)
+                return v;
+            v->palabras = temp;
+        }
 
-    v->palabras[v->cantidad] = malloc((j + 1) * sizeof(char));
-    strcpy(v->palabras[v->cantidad], buffer);
-    v->cantidad++;
+        v->palabras[v->cantidad] = malloc((j + 1) * sizeof(char));
+        strcpy(v->palabras[v->cantidad], buffer);
+        v->cantidad++;
+    }
 
     return v;
 }
@@ -62,13 +67,14 @@ void vector_destruir(struct vector *v) {
     if (!v)
         return;
 
-    for (int i = 0; i < v->cantidad; i++) {
+    for (size_t i = 0; i < v->cantidad; i++) {
         free(v->palabras[i]);
     }
 
     free(v->palabras);
     free(v);
 }
+
 
 /*int main() {
   char texto[] = "hola;1;2;3";
