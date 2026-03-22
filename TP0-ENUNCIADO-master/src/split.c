@@ -41,7 +41,6 @@ struct vector *split(char *texto, char separador) {
         i++;
     }
 
-    // última palabra (clave)
     buffer[j] = '\0';
 
     if (v->cantidad >= capacidad) {
