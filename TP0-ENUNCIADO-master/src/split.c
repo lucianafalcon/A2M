@@ -4,8 +4,7 @@
 
 #define CAPACIDAD_INICIAL 10
 
-struct vector *split(char *texto, char separador)
-{
+struct vector *split(char *texto, char separador) {
     if (texto == NULL) {
         return NULL;
     }
@@ -57,8 +56,7 @@ struct vector *split(char *texto, char separador)
     return v;
 }
 
-void vector_destruir(struct vector *v)
-{
+void vector_destruir(struct vector *v) {
     if (!v) {
         return;
     }
