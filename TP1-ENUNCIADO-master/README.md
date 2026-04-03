@@ -33,19 +33,19 @@
 ### 1.1. Compilar el proyecto
 
 ```bash
-comando
+gcc src/tp1.c main.c -o tp1.out
 ```
 
 ### 1.2. Ejecutar las pruebas
 
 ```bash
-comando
+gcc pruebas/pruebas_alumno.c -o pruebas.out
 ```
 
 ### 1.3. Ejecutar el programa con Valgrind
 
 ```bash
-comando
+valgrind --leak-check=full ./pruebas.out
 ```
 
 ## 2. Funcionamiento
@@ -73,42 +73,49 @@ Cuando el vector llega a su máximo el programa procede a escalarlo con un facto
 
 ## 3. Estructura
 
-Explicar cómo se implementó la/s estructura/s pedida/s en el [enunciado](./ENUNCIADO.md). En esta sección el objetivo es explicar en líneas generales, no técnicas, qué contiene la estructura, para qué y por qué.
+Para implementar la estructura decidí hacerlo con un campo ..., además tiene un puntero que... y eso permite que....
 
-## 3. Estructura (EJEMPLO)
+Para implementar la estructura decidí hacerlo con un campo `struct tp1` , además tiene un puntero de entrada a toda la información, y eso permite gestionar los datos de manera eficiente. Ademas se optó por un vector dinámico de punteros para cumplir con la restricción de no presuponer tamaños máximos.
 
-Para implementar la estructura decidí hacerlo con un campo..., además tiene un puntero que... y eso permite que....
+En esta arquitectura, el administrador contiene un puntero doble `struct pokemon **` que apunta a un bloque de memoria donde se almacenan las direcciones de cada Pokémon. Cada Pokémon, a su vez, es una estructura independiente alojada en el Heap.
+
+Esta decisión de diseño aporta dos ventajas críticas:
+
+* Eficiencia en el realloc: Al redimensionar la estructura (cuando el vector crece), solo movemos punteros (8 bytes cada uno), evitando el costo computacional de copiar estructuras completas con múltiples campos.
+
+* Optimización de ordenamiento: Durante el ordenamiento alfabético, el intercambio de posiciones se realiza sobre los punteros en el vector, manteniendo los datos originales del Pokémon estáticos en su posición del Heap.
 
 ### 3.1. Diagrama de memoria
 
-Realizar un diagrama de memoria de la estructura de memoria durante la ejecución del programa, esto debe incluir el stack y el heap con las estructuras contenidas en ellos.
-
-### 3.1 Diagrama de memoria (EJEMPLO)
-
 <div align="center">
   <img src="img/diagrama_memoria__1.svg" width="70%">
-  <p>Diagrama de memoria de la estructura.</p>
+  <p>Figura 3.1 Diagrama de memoria de la estructura.</p>
 </div>
 
-### 3.2. Análisis de complejidades
+En el diagrama de la figura 3.1 se representa la distribución de los elementos: el puntero inicial se encuentra en el Stack, mientras que el administrador tp1, el vector de punteros y las estructuras pokemon individuales residen en el Heap. Se destaca que cada nombre de Pokémon también es un puntero a una cadena de caracteres dinámica, permitiendo soportar nombres de cualquier longitud.
 
-Explicar las complejidades de las diversas funciones que se implementaron en el programa. Esto debe incluir al menos a las funciones de la interfaz (el .h) del programa. Además, se debe ofrecer una justificación de la complejidad, es decir, por qué es esa la complejidad Big-O y no otra.
 
-### 3.2. Análisis de complejidades (EJEMPLO 1)
-
-En el programa tenemos funciones auxiliares y funciones principales (las que van en el .h). Respecto a estas funciones podemos analizar que:
-
-- `fun1` tiene una complejidad de $O(1)$ ya que tiene como parámetro... y, al leer una línea....
-- `fun2` tiene una complejidad de $O(n)$ ya que tiene como parámetro..., la cual....
-- `fun3` tiene una complejidad de $O(n^2)$ ya que tiene como parámetro... y se encarga de....
-
-### 3.2. Análisis de complejidades (EJEMPLO 2)
+### 3.2. Análisis de complejidades 
 
 | Función | Complejidad |                  Justificación                   |
 | :-----: | :---------: | :----------------------------------------------: |
-| `fun1`  |   $O(1)$    | Tiene como parámetro... y, al leer una línea.... |
-| `fun2`  |   $O(n)$    |       Tiene como parámetro..., la cual....       |
-| `fun3`  |  $O(n^2)$   |   Tiene como parámetro... y se encarga de....    |
+| `tp1_leer_archivo(const char *nombre_archivo)`  |  $O(n^2)$   | Por cada uno de los $n$ registros del archivo, se realiza una búsqueda de duplicados ($O(n)$). Además, al finalizar la carga, se aplica un ordenamiento (Bubble Sort) cuya complejidad en el peor caso es cuadrática. |
+`*tp1_guardar_archivo(tp1_t *tp, const char *nombre)`  |  $O(n)$   | Recorre el vector una sola vez escribiendo los datos de cada Pokémon en el archivo de salida. |
+| `*tp1_filtrar_tipo(tp1_t *tp, enum tipo_pokemon tipo)`  |  $O(n^2)$   | Recorre los $n$ elementos ($O(n)$) y, por cada coincidencia, inserta en un nuevo TP que vuelve a ordenar al final ($O(k^2)$ siendo $k \leq n$). |
+| `pokemon *tp1_buscar_nombre(tp1_t *tp, const char *nombre)`  |   $O(n)$    | Tiene como parámetro el puntero al TP y el nombre a buscar. Realiza un recorrido sobre el vector de punteros a Pokémon comparando cada nombre con strcasecmp hasta encontrarlo o llegar al final. |
+| `pokemon *tp1_buscar_orden(tp1_t *tp, int n)`  |  $O(1)$   | Al tener los datos en un vector y estar ya ordenados, el acceso por índice es directo y constante. |
+| ` tp1_con_cada_pokemon(tp1_t *tp, bool (*f)(struct pokemon *, void *)`  |   $O(n)$    | Tiene como parámetro el puntero al TP y una función de callback. Recorre el vector de punteros a Pokémon uno por uno (desde el índice 0 hasta $n-1$) invocando la función para cada elemento, asegurando un único paso por la estructura. |
+| `tp1_destruir(tp1_t *tp)`  |  $O(n)$   | Debe recorrer el vector para liberar la memoria de cada Pokémon individualmente y finalmente liberar el vector y la estructura principal.  |
+
+Funciones auxiliares: 
+
+`void consumir_linea(FILE *archivo)`,  `char *leer_campo_din(FILE *archivo)` y `enum tipo_pokemon conversor_texto_enum(char *texto)` tienen una complejidad de $O(L)$, donde $L$ es la longitud de la línea o palabra procesada.
+
+`void ordenar(tp1_t *tp)`  es $O(n^2)$ , implementa el algoritmo de Bubble Sort, el cual requiere dos bucles anidados para comparar e intercambiar los punteros del vector en el peor caso. 
+
+`const char *tipo_a_texto(enum tipo_pokemon tipo)` es $O(1)$, realiza un acceso directo (usando un switch o un vector estático) basado en el valor del enum. No requiere comparaciones de strings.
+
+
 
 ## 4. Decisiones de diseño y/o complejidades de implementación
 
@@ -118,20 +125,17 @@ Explicar las decisiones de diseño y/o las complejidades de implementación que 
 
 La mayor complejidad en el TP se encuentra en la función `foo` que requiere hacer...; es por esto que decidí.... Además, decidí que el programa haga... para mejorar la implementación.
 
+
 ## 5. Respuestas a las preguntas teóricas
 
-Deberás incluir en esta sección las respuestas a las preguntas teóricas indicadas en el [enunciado](./ENUNCIADO.md) del TP.
+### 5.1. Explicar la elección de la estructura para implementar la funcionalida pedida. Justifique el uso de cada uno de los campos de la estructura.
 
-## 5. Respuestas a las preguntas teóricas (EJEMPLO)
+### 5.2 Dar una definición de complejidad computacional y explique cómo se calcula.
 
-### 5.1. ¿Porqué...?
+### 5.3 Explicar con diagramas cómo quedan dispuestas las estructuras y elementos en memoria.
 
-Respondido en su respectiva sección.
+### 5.4 Justificar la complejidad computacional temporal de cada una de las funciones que se piden implementar.
 
-### 5.2 ¿Cómo...?
+### 5.5 Explique qué dificultades tuvo para implementar las funcionalidades pedidas en el main (si tuvo alguna) y explique si alguna de estas dificultades se podría haber evitado modificando la definición del .h
 
-Para implementar el....
 
-### 5.3 ¿Cuál fue el...?
-
-El motivo fue....
