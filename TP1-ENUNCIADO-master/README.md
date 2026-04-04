@@ -84,8 +84,6 @@ Esta decisión de diseño aporta dos ventajas críticas:
 
 ### 3.1. Diagrama de memoria
 
-### 3.1. Diagrama de memoria
-
 <div align="center">
   <img src="https://github.com/user-attachments/assets/e2be0417-1e61-425d-b7ac-646660b734f6" alt="Diagrama de memoria TP1" width="80%">
   <p><i>Figura 3.1: Diagrama de memoria de la estructura tp1, vector de punteros y nodos pokemon.</i></p>
