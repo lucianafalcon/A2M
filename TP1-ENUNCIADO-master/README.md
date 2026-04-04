@@ -54,7 +54,7 @@ El programa funciona como un sistema de gestión y consulta de una base de datos
 
 Su objetivo principal es leer y procesar un archivo de entrada, validar la información contenida en cada registro y almacenar los datos en estructuras dinámicas en memoria. A partir de estos datos, el sistema permite al usuario realizar distintas operaciones, como búsquedas específicas (por nombre, tipo) y visualizaciones ordenadas de la colección.
 
-Además, el programa contempla el manejo de errores en la lectura del archivo, validando formatos incorrectos o datos inválidos, lo que garantiza la integridad de la información almacenada. De esta forma, se logra un sistema flexible y robusto para la manipulación de datos de la Pokédex.
+Además, el programa contempla el manejo de errores en la lectura del archivo, validando formatos incorrectos o datos inválidos, lo que garantiza la integridad de la información almacenada.
 
 Proceso de Carga y Validación     
 Al iniciar, el programa lee el archivo línea por línea. Cada registro es validado para asegurar que contiene todos los campos necesarios (nombre, tipo y tres tipos numéricos). Si una línea está corrupta o le faltan datos, el programa la ignora y continúa con la siguiente, para no impedir la carga del resto de la Pokedex.   
@@ -66,21 +66,21 @@ A medida que se leen registros válidos, el sistema expande su capacidad de alma
 Decisiones de Funcionamiento      
 Para los casos donde el enunciado no era explícito, se implementaron las siguientes decisiones:   
 - Archivos Vacíos: Si el archivo existe pero no tiene registros válidos, el programa informa que la Pokedex está vacía en lugar de finalizar con error.   
-- Búsquedas Fallidas: Al buscar un Pokémon que no existe, el programa devuelve un mensaje descriptivo al usuario en lugar de simplemente no mostrar nada.      
-- Tratamiento de Espacios: Se decidió que los nombres de los Pokémon pueden contener espacios (por ejemplo, "Mr. Mime"), procesándolos como un único campo de texto hasta encontrar la coma separadora.   
-- Tipos Desconocidos: Si un Pokémon tiene un código de tipo que no está en la lista oficial (como "WIND"), esa línea se considera inválida y se saltea.   
+- Búsquedas Fallidas: Al buscar un Pokémon que no existe, el programa devuelve un mensaje descriptivo al usuario.      
+- Tratamiento de Espacios: Los nombres de los Pokémon pueden contener espacios (por ej "Mr. Mime"), procesándolos como un único campo de texto hasta encontrar la coma separadora.   
+- Tipos Desconocidos: Si un Pokémon tiene un código de tipo que no está en la lista oficial, esa línea se considera inválida y se saltea.   
 
 ## 3. Estructura
 
 Para implementar la estructura decidí hacerlo con un campo `struct tp1` , además tiene un puntero de entrada a toda la información, y eso permite gestionar los datos de manera eficiente. Ademas se optó por un vector dinámico de punteros para cumplir con la restricción de no presuponer tamaños máximos.
 
-En esta arquitectura, el administrador contiene un puntero doble `struct pokemon **` que apunta a un bloque de memoria donde se almacenan las direcciones de cada Pokémon. Cada Pokémon, a su vez, es una estructura independiente alojada en el Heap.
+En esta arquitectura, el administrador contiene un puntero doble `struct pokemon **` que apunta a un bloque de memoria donde se almacenan las direcciones de cada Pokémon, el cual, a su vez, es una estructura independiente alojada en el Heap.
 
 Esta decisión de diseño aporta dos ventajas críticas:
 
 * Eficiencia en el realloc: Al redimensionar la estructura (cuando el vector crece), solo movemos punteros (8 bytes cada uno), evitando el costo computacional de copiar estructuras completas con múltiples campos.
 
-* Optimización de ordenamiento: Durante el ordenamiento alfabético, el intercambio de posiciones se realiza sobre los punteros en el vector, manteniendo los datos originales del Pokémon estáticos en su posición del Heap.
+* Optimización de ordenamiento: Durante el ordenamiento alfabético, el intercambio de posiciones se realiza sobre los punteros en el vector, manteniendo los datos originales del Pokemon estáticos en su posición del Heap.
 
 ### 3.1. Diagrama de memoria
 
@@ -96,9 +96,9 @@ En el diagrama de la figura 3.1 se representa la distribución de los elementos:
 
 | Función | Complejidad |                  Justificación                   |
 | :-----: | :---------: | :----------------------------------------------: |
-| `tp1_leer_archivo(const char *nombre_archivo)`  |  $O(n^2)$   | Por cada uno de los $n$ registros del archivo, se realiza una búsqueda de duplicados ($O(n)$). Además, al finalizar la carga, se aplica un ordenamiento (Bubble Sort) cuya complejidad en el peor caso es cuadrática. |
+| `tp1_leer_archivo(const char *nombre_archivo)`  |  $O(n^2)$   | Por cada uno de los $n$ registros del archivo, se realiza una búsqueda de duplicados $O(n)$. Además, al finalizar la carga, se aplica un ordenamiento (Bubble Sort) cuya complejidad en el peor caso es cuadrática. |
 `*tp1_guardar_archivo(tp1_t *tp, const char *nombre)`  |  $O(n)$   | Recorre el vector una sola vez escribiendo los datos de cada Pokémon en el archivo de salida. |
-| `*tp1_filtrar_tipo(tp1_t *tp, enum tipo_pokemon tipo)`  |  $O(n^2)$   | Recorre los $n$ elementos ($O(n)$) y, por cada coincidencia, inserta en un nuevo TP que vuelve a ordenar al final ($O(k^2)$ siendo $k \leq n$). |
+| `*tp1_filtrar_tipo(tp1_t *tp, enum tipo_pokemon tipo)`  |  $O(n^2)$   | Recorre los $n$ elementos ($O(n)$) y, por cada coincidencia, inserta en un nuevo TP que vuelve a ordenar al final $O(n^2)$. |
 | `pokemon *tp1_buscar_nombre(tp1_t *tp, const char *nombre)`  |   $O(n)$    | Tiene como parámetro el puntero al TP y el nombre a buscar. Realiza un recorrido sobre el vector de punteros a Pokémon comparando cada nombre con strcasecmp hasta encontrarlo o llegar al final. |
 | `pokemon *tp1_buscar_orden(tp1_t *tp, int n)`  |  $O(1)$   | Al tener los datos en un vector y estar ya ordenados, el acceso por índice es directo y constante. |
 | ` tp1_con_cada_pokemon(tp1_t *tp, bool (*f)(struct pokemon *, void *)`  |   $O(n)$    | Tiene como parámetro el puntero al TP y una función de callback. Recorre el vector de punteros a Pokémon uno por uno (desde el índice 0 hasta $n-1$) invocando la función para cada elemento, asegurando un único paso por la estructura. |
@@ -117,10 +117,13 @@ Funciones auxiliares:
 ## 4. Decisiones de diseño y/o complejidades de implementación
 
 Gestión de la lectura y robustez   
-Una de las mayores complejidades fue la implementación de tp1_leer_archivo. Para cumplir con la restricción de no presuponer longitudes máximas, se diseñó la función auxiliar leer_campo_din. Esta función utiliza un buffer dinámico que crece a medida que se leen caracteres, permitiendo procesar nombres o tipos de cualquier extensión sin desbordamientos de memoria.Además, se implementó una política de "barrido de línea" ante errores: si un campo numérico no puede ser convertido o si el formato de la línea es inválido, el programa utiliza una función consumir_linea para descartar el resto del registro actual y posicionar el puntero del archivo al inicio de la siguiente línea, evitando así que un error puntual corrompa toda la carga.   
+Una de las mayores complejidades fue la implementación de tp1_leer_archivo. Para cumplir con la restricción de no presuponer longitudes máximas, se diseñó la función auxiliar `leer_campo_din`. Esta función utiliza un buffer dinámico que crece a medida que se leen caracteres, permitiendo procesar nombres o tipos de cualquier extensión sin desbordamientos de memoria. Además, se implementó una política de "barrido de línea" ante errores: si un campo numérico no puede ser convertido o si el formato de la línea es inválido, el programa utiliza una función `consumir_linea` para descartar el resto del registro actual y posicionar el puntero del archivo al inicio de la siguiente línea, evitando así que un error puntual corrompa toda la carga.   
 
 Estrategia de ordenamiento e intercambios   
-Se decidió implementar el algoritmo de Bubble Sort operando directamente sobre el vector de punteros. La decisión de diseño de usar un vector de punteros (en lugar de un vector de estructuras) fue crítica aquí: al detectar que dos elementos deben ser intercambiados, el programa solo mueve dos punteros (direcciones de memoria), lo cual es una operación de costo constante y mínimo, independientemente del tamaño de la estructura pokemon.Tratamiento de DuplicadosPara cumplir con el requisito de conservar solo la primera aparición de un Pokémon, se optó por realizar una búsqueda lineal ($O(n)$) antes de cada inserción. Si bien esto eleva la complejidad de la carga a $O(n^2)$, garantiza la integridad de la Pokedex según las reglas de negocio planteadas (insensibilidad a mayúsculas/minúsculas mediante strcasecmp).
+Se decidió implementar el algoritmo de Bubble Sort operando directamente sobre el vector de punteros. La decisión de diseño de usar un vector de punteros (en lugar de un vector de estructuras) fue crítica ya que al detectar que dos elementos deben ser intercambiados, el programa solo mueve dos punteros (direcciones de memoria), lo cual es una operación de costo constante y mínimo, independientemente del tamaño de la estructura pokemon.
+
+Tratamiento de Duplicados   
+Para cumplir con el requisito de conservar solo la primera aparición de un Pokemon, se optó por realizar una búsqueda lineal ($O(n)$) antes de cada inserción. Si bien esto eleva la complejidad de la carga a $O(n^2)$, garantiza la indiscriminación de mayúsculas/minúsculas mediante strcasecmp.
 
 Implementación del Main y Modularización   
 En el main.c, se decidió separar la lógica de parseo de argumentos de la lógica de ejecución. Se implementaron funciones de ayuda para transformar los tipos de Pokémon de texto a enum y viceversa, centralizando estas conversiones para facilitar el mantenimiento del código y evitar la repetición de comparaciones de strings a lo largo del programa.
@@ -139,12 +142,13 @@ Cantidad (size_t cantidad): Es fundamental para conocer el tamaño actual del ve
 ### 5.2 Dar una definición de complejidad computacional y explique cómo se calcula.   
 
 La complejidad computacional es una medida que permite estimar cuántos recursos (tiempo o memoria) consume un algoritmo en función del tamaño de la entrada ($n$).  
+ 
+<div align="center" style="background-color: white; padding: 10px;">
+    <img width="540" height="540" alt="New Template" src="https://github.com/user-attachments/assets/f37cae2e-da12-4a45-a7be-fd69b631d3f0" />
+    <p><i>Figura 5.2: Diagrama Big O.</i></p>
+</div>
 
-Se expresa generalmente con notación Big-O:   
-O(1) → constante   
-O(n) → lineal   
-O(n²) → cuadrática   
-O(log n) → logarítmica 
+Se expresa generalmente con notación Big-O, como se muestra en la figura 5.2.
 
 Cómo se calcula:  
 * Se identifican las operaciones dominantes (como comparaciones o asignaciones dentro de bucles).   
@@ -158,12 +162,12 @@ Detalles y representación gráfica en la Sección 3.1 Diagrama de memoria.
 
 Basado en el análisis de la sección 3.2, la justificación técnica es la siguiente:
 
-* tp1_leer_archivo ($O(n^2)$): Por cada uno de los $n$ registros leídos del archivo, se realiza una búsqueda lineal para evitar duplicados ($O(n)$). Finalmente, se ejecuta un ordenamiento de burbuja que, en el peor caso, también es cuadrático.   
-* tp1_buscar_nombre ($O(n)$): Al no estar el vector indexado por nombre de forma asociativa, se debe realizar un recorrido secuencial comparando strings hasta hallar la coincidencia.   
-* tp1_buscar_orden ($O(1)$): Al utilizar un vector dinámico, el acceso a una posición específica mediante un índice es una operación de tiempo constante.   
-* tp1_con_cada_pokemon ($O(n)$): La función recorre el vector de principio a fin una sola vez, invocando el callback para cada elemento.   
-* tp1_filtrar_tipo ($O(n^2)$): Requiere un recorrido completo del vector original ($O(n)$) y, dependiendo de la implementación del ordenamiento en la nueva estructura filtrada, puede alcanzar una complejidad cuadrática.   
-* tp1_destruir ($O(n)$): Se debe iterar sobre el vector para liberar la memoria de cada Pokémon individualmente antes de liberar el vector y la estructura principal.   
+* tp1_leer_archivo $O(n^2)$: Por cada uno de los $n$ registros leídos del archivo, se realiza una búsqueda lineal para evitar duplicados ($O(n)$). Finalmente, se ejecuta un ordenamiento de burbuja que, en el peor caso, también es cuadrático.   
+* tp1_buscar_nombre $O(n)$: Al no estar el vector indexado por nombre de forma asociativa, se debe realizar un recorrido secuencial comparando strings hasta hallar la coincidencia.   
+* tp1_buscar_orden $O(1)$: Al utilizar un vector dinámico, el acceso a una posición específica mediante un índice es una operación de tiempo constante.   
+* tp1_con_cada_pokemon $O(n)$: La función recorre el vector de principio a fin una sola vez, invocando el callback para cada elemento.   
+* tp1_filtrar_tipo $O(n^2)$: Requiere un recorrido completo del vector original ($O(n)$) y, dependiendo de la implementación del ordenamiento en la nueva estructura filtrada, puede alcanzar una complejidad cuadrática.   
+* tp1_destruir $O(n)$: Se debe iterar sobre el vector para liberar la memoria de cada Pokémon individualmente antes de liberar el vector y la estructura principal.   
 
 ### 5.5 Explique qué dificultades tuvo para implementar las funcionalidades pedidas en el main (si tuvo alguna) y explique si alguna de estas dificultades se podría haber evitado modificando la definición del .h
 
