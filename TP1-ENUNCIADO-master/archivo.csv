@@ -1,0 +1,10 @@
+Pikachu,ELEC,55,40,90
+Charmander,FUEG,52,43,65
+Bulbasaur,PLAN,49,49,45
+Pikachu,ELEC,99,99,99
+PIKACHU,ELEC,55,40,90
+
+Charmander,,52,43,65
+Bulbasaur,PLAN,,49,45
+Pikachu,ELEC,99,,99
+PIKACHU,ELEC,55,40,
